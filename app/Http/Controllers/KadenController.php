@@ -36,10 +36,11 @@ class KadenController extends Controller
                         'Referer' => config('app.url'),
                         'Origin' => config('app.url'),
                     ])
-                    ->get('https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601', [
+                    ->get('https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260701', [
                         'format' => 'json',
                         'formatVersion' => 2,
                         'applicationId' => env('RAKUTEN_APP_ID'),
+                        'accessKey' => env('RAKUTEN_ACCESS_KEY'),
                         'affiliateId' => env('RAKUTEN_AFFILIATE_ID'),
                         'keyword' => $keyword,
                         'hits' => 30,
