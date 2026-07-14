@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://kaden-hikaku.example.com/sitemap.xml
