@@ -87,6 +87,12 @@
   @if (session('review_success'))
     <div class="alert alert-success py-2">口コミを投稿しました！</div>
   @endif
+  @if (session('success'))
+    <div class="alert alert-success py-2">{{ session('success') }}</div>
+  @endif
+  @if ($errors->any())
+    <div class="alert alert-danger py-2">{{ $errors->first() }}</div>
+  @endif
 
   @if(empty($results))
     <p>「{{ $keyword }}」に一致する商品が見つかりませんでした。別のキーワードもお試しください。</p>
@@ -112,6 +118,25 @@
           @endif
           @if(!empty($item['reviewCount']))
             <p class="mb-1 small text-muted">楽天市場評価: ★{{ $item['reviewAverage'] ?? '-' }}（{{ $item['reviewCount'] }}件）</p>
+          @endif
+
+          @if(!empty($item['itemPrice']) && $itemId)
+            @php
+              $isWatching = session('line_user_local_id')
+                  ? \App\Models\ItemWatch::where('line_user_id', session('line_user_local_id'))->where('item_code', $itemId)->exists()
+                  : false;
+            @endphp
+            <form method="POST" action="{{ route('item-watches.toggle') }}" class="mb-2">
+              @csrf
+              <input type="hidden" name="item_code" value="{{ $itemId }}">
+              <input type="hidden" name="item_name" value="{{ $item['itemName'] ?? '' }}">
+              <input type="hidden" name="price" value="{{ $item['itemPrice'] }}">
+              @if ($isWatching)
+                <button type="submit" class="btn btn-outline-secondary btn-sm">🔕 価格ウォッチをやめる</button>
+              @else
+                <button type="submit" class="btn btn-line btn-sm">🔔 値下がったらLINEで通知</button>
+              @endif
+            </form>
           @endif
           <div class="mb-2">
             <a href="{{ $item['affiliateUrl'] ?? ($item['itemUrl'] ?? '#') }}" class="btn btn-sm btn-primary" target="_blank" rel="noopener noreferrer sponsored">楽天市場で見る</a>

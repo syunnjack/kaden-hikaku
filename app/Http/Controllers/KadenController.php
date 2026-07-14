@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Review;
-use Illuminate\Http\Client\ConnectionException;
+use App\Support\RakutenKadenSearch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 
 class KadenController extends Controller
 {
@@ -29,29 +28,11 @@ class KadenController extends Controller
             return redirect()->route('kaden.index');
         }
 
-        $results = Cache::remember("kaden-search:{$keyword}", now()->addHour(), function () use ($keyword) {
-            try {
-                $response = Http::timeout(5)
-                    ->withHeaders([
-                        'Referer' => config('app.url'),
-                        'Origin' => config('app.url'),
-                    ])
-                    ->get('https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260701', [
-                        'format' => 'json',
-                        'formatVersion' => 2,
-                        'applicationId' => env('RAKUTEN_APP_ID'),
-                        'accessKey' => env('RAKUTEN_ACCESS_KEY'),
-                        'affiliateId' => env('RAKUTEN_AFFILIATE_ID'),
-                        'keyword' => $keyword,
-                        'hits' => 30,
-                        'sort' => 'standard',
-                    ]);
-            } catch (ConnectionException) {
-                return [];
-            }
-
-            return $response->successful() ? ($response->json('Items') ?? []) : [];
-        });
+        $results = Cache::remember(
+            "kaden-search:{$keyword}",
+            now()->addHour(),
+            fn () => RakutenKadenSearch::search($keyword)
+        );
 
         $itemIds = collect($results)
             ->map(fn ($item) => $item['itemCode'] ?? null)
