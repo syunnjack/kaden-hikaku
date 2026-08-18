@@ -33,3 +33,25 @@ jobs:
           remote_path: '/home/xs501620/kaden-hikaku.jp/public_html/'
           sftp_only: true
           delete_remote_files: false
+
+      # public/ しか送っていなかったため、blade を直しても本番に届かなかった。
+      # サーバ上では public_html が app/public へのシンボリックリンクで、
+      # Laravel 本体は <ドメイン>/app/ に置かれている。
+      #   ~/kaden-hikaku.jp/app/            リポジトリのルート相当
+      #   ~/kaden-hikaku.jp/public_html  -> app/public
+      #
+      # 消す操作は一切しない。views の更新だけを届ける。
+      #
+      # 注意: app/ routes/ config/ は対象外なので、コントローラやルートを
+      # 変えたときは別途デプロイが要る。
+      - name: Deploy views to Xserver via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          username: ${{ secrets.SSH_USERNAME }}
+          server: ${{ secrets.SSH_HOST }}
+          port: 10022
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          local_path: './resources/*'
+          remote_path: '/home/xs501620/kaden-hikaku.jp/app/resources/'
+          sftp_only: true
+          delete_remote_files: false

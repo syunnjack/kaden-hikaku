@@ -134,7 +134,12 @@
               @if ($isWatching)
                 <button type="submit" class="btn btn-outline-secondary btn-sm">🔕 価格ウォッチをやめる</button>
               @else
+                {{-- LINEの認証情報が未設定のうちは、押すとLINE側でエラーになるので出さない --}}
+                @if (config('services.line.login_channel_id'))
                 <button type="submit" class="btn btn-line btn-sm">🔔 値下がったらLINEで通知</button>
+                @else
+                  <button type="button" class="btn btn-secondary" disabled>🔔 値下がったらLINEで通知（準備中）</button>
+                @endif
               @endif
             </form>
           @endif
