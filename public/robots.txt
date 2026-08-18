@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://gadget-hikaku.jp/sitemap.xml
+Sitemap: https://kaden-hikaku.jp/sitemap.xml
