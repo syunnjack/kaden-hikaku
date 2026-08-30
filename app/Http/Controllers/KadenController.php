@@ -46,7 +46,20 @@ class KadenController extends Controller
 
         $faq = $this->buildFaq($keyword, $reviews);
 
-        return view('kaden.results', compact('results', 'keyword', 'reviews', 'faq'));
+        // canonical は自分自身（keyword 付き）を指す。
+        // url()->current() はクエリ文字列を落とすため、ここを既定のままにすると
+        // カテゴリ9ページが全部 /search を canonical に指してしまい、
+        // Google が1ページに統合して個別ページが索引されなくなる。
+        //
+        // sitemap に載せているのは下記のカテゴリだけ。それ以外の任意キーワードは
+        // ただの検索結果なので noindex にする（中身は楽天の検索結果そのままで、
+        // 語の組み合わせだけ違うページが無数に作れてしまうため）。
+        $isCategory = in_array($keyword, self::CATEGORIES, true);
+
+        return view('kaden.results', compact('results', 'keyword', 'reviews', 'faq') + [
+            'canonical' => route('kaden.search', ['keyword' => $keyword]),
+            'noindex' => ! $isCategory,
+        ]);
     }
 
     private function buildFaq(string $keyword, Collection $reviews): array

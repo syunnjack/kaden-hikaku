@@ -7,13 +7,18 @@
 
     <title>@yield('title', config('app.name') . ' | 価格と口コミで家電・ガジェットを比較')</title>
     <meta name="description" content="@yield('description', '家電・ガジェットをジャンル・キーワードから検索できるサイトです。楽天市場の価格情報に加えて、実際に使った人の口コミも確認できます。')">
-    <link rel="canonical" href="{{ url()->current() }}">
+    {{-- 既定は自分自身。クエリ文字列で内容が変わるページは、
+         コントローラから $canonical を渡してそちらを使う。 --}}
+    <link rel="canonical" href="{{ $canonical ?? url()->current() }}">
+    @if ($noindex ?? false)
+      <meta name="robots" content="noindex, follow">
+    @endif
 
     <meta property="og:site_name" content="{{ config('app.name') }}">
     <meta property="og:type" content="website">
     <meta property="og:title" content="@yield('title', config('app.name') . ' | 価格と口コミで家電・ガジェットを比較')">
     <meta property="og:description" content="@yield('description', '家電・ガジェットをジャンル・キーワードから検索できるサイトです。楽天市場の価格情報に加えて、実際に使った人の口コミも確認できます。')">
-    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:url" content="{{ $canonical ?? url()->current() }}">
     <meta property="og:locale" content="ja_JP">
 
     <meta name="twitter:card" content="summary">
